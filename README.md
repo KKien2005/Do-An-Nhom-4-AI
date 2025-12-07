@@ -31,7 +31,6 @@
 -Cài đặt thư viện cần thiết
 Mở Terminal tại thư mục dự án và chạy:
 pip install ttkbootstrap 
-- Chỉnh lại folder chứa dự liệu tại file UI.py dòng 113
 - Sau đó chạy python main.py
 - Trên giao diện ứng dụng
 
