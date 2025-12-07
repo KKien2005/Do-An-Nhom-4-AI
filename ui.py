@@ -2,6 +2,7 @@ import ttkbootstrap as ttkb  # Thư viện giao diện hiện đại, cải ti�
 from ttkbootstrap.constants import *  # Các hằng số giao diện (PRIMARY, SUCCESS, INFO, v.v.)
 from tkinter import messagebox, Text  # Thư viện tkinter gốc: messagebox để hiển thị thông báo, Text để nhập/xuất văn bản
 import csv  # Đọc file CSV
+import os  # Thư viện để làm việc với đường dẫn file
 from knapsack_algorithm import simulated_annealing  # Hàm giải bài toán tối ưu hóa balo (knapsack)
 
 class InventoryManagementApp:
@@ -29,14 +30,20 @@ class InventoryManagementApp:
         title_label = ttkb.Label(left_frame, text="📦 Dữ liệu hàng tồn kho", bootstyle="info", font=("Arial", 14, "bold"))
         title_label.pack(pady=15)
 
-        # Bảng hiển thị dữ liệu vật phẩm với màu đẹp hơn
+        # Bảng hiển thị dữ liệu vật phẩm với màu đẹp hơn - giới hạn chiều cao để không che nút
+        tree_container = ttkb.Frame(left_frame)
+        tree_container.pack(pady=10, fill="x")  # Chỉ fill theo chiều ngang, không expand
         self.tree = ttkb.Treeview(
-            left_frame, columns=("Name", "Value", "Weight"), show="headings", bootstyle="success"
+            tree_container, columns=("Name", "Value", "Weight"), show="headings", bootstyle="success", height=6
         )
         self.tree.heading("Name", text="Tên")  # Cột tên
         self.tree.heading("Value", text="Giá trị")  # Cột giá trị
         self.tree.heading("Weight", text="Trọng lượng")  # Cột trọng lượng
-        self.tree.pack(pady=10, fill="both", expand=True)  # Hiển thị bảng
+        # Thêm scrollbar cho Treeview
+        scrollbar = ttkb.Scrollbar(tree_container, orient="vertical", command=self.tree.yview)
+        self.tree.configure(yscrollcommand=scrollbar.set)
+        self.tree.pack(side="left", fill="both", expand=True)
+        scrollbar.pack(side="right", fill="y")
 
         # Nút tải dữ liệu từ CSV với màu xanh dương đẹp
         self.load_button = ttkb.Button(
@@ -92,12 +99,16 @@ class InventoryManagementApp:
         self.max_weight_entry = ttkb.Entry(max_weight_frame, bootstyle="primary", width=20)  # Ô nhập trọng lượng tối đa
         self.max_weight_entry.pack(pady=5)
 
-        # Nút chạy thuật toán với màu xanh lá nổi bật
+        # Tạo frame riêng cho nút chạy thuật toán ở cuối cùng - đảm bảo luôn hiển thị
+        bottom_frame = ttkb.Frame(left_frame)
+        bottom_frame.pack(side="bottom", fill="x", pady=15)
+        
+        # Nút chạy thuật toán với màu xanh lá nổi bật - đảm bảo luôn hiển thị
         self.run_button = ttkb.Button(
-            left_frame, text="🚀 Chạy thuật toán", command=self.run_algorithm, 
+            bottom_frame, text="🚀 Chạy thuật toán", command=self.run_algorithm, 
             bootstyle="success", width=25
         )
-        self.run_button.pack(pady=15)
+        self.run_button.pack()
 
         # ===========================
         # Khu vực bên phải (right_frame)
@@ -251,8 +262,11 @@ class InventoryManagementApp:
     #Lưu lại dữ liệu sau khi thao tác thêm, xóa
     def save_data_to_csv(self):
         """Ghi toàn bộ dữ liệu vào file CSV."""
-        file_path = r"D:\Download\KnapsackApp_PY-main (1)\KnapsackApp_PY-main\data_100_unique.csv"
+        # Lưu file CSV vào thư mục hiện tại của dự án
+        file_path = os.path.join(os.path.dirname(__file__), "data_100_unique.csv")
         try:
+            # Tạo thư mục nếu chưa tồn tại (nếu file_path có thư mục con)
+            os.makedirs(os.path.dirname(file_path), exist_ok=True)
             with open(file_path, mode="w", newline="", encoding="utf-8") as csvfile:
                 writer = csv.writer(csvfile)
                 # Ghi tiêu đề cột
