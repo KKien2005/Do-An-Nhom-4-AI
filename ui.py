@@ -127,7 +127,7 @@ class InventoryManagementApp:
 
     def load_data_from_csv(self):
         """Tải dữ liệu từ file CSV."""
-        file_path = r"C:\Users\Lenovo\OneDrive\Desktop\Đồ Án AI\SIMULATED_ANNEALING\data_500_unique.csv"  # Đường dẫn file CSV
+        file_path = "data_500_unique.csv"  # Đường dẫn file CSV
         try:
             self.items.clear()  # Xóa danh sách hiện tại
             for item in self.tree.get_children():  # Xóa bảng hiển thị
